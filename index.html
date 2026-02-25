@@ -3,115 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PIXXX - Sua Live, Seu Lucro</title>
-    <!-- CSS para deixar o app bonito -->
+    <title>PIXXX - Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Motor da Câmera (Agora.io) -->
     <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.11.0.js"></script>
     <style>
-        body { background-color: #0a0a0a; color: white; font-family: sans-serif; }
-        .neon-purple { color: #bc13fe; text-shadow: 0 0 10px #bc13fe; }
-        .bg-purple { background-color: #bc13fe; }
-        .video-box { width: 100%; height: 450px; background: #000; border: 2px solid #bc13fe; border-radius: 24px; overflow: hidden; position: relative; }
+        body { background-color: #050505; color: white; font-family: sans-serif; overflow-x: hidden; }
+        .neon-purple { color: #bc13fe; text-shadow: 0 0 15px #bc13fe; }
+        .bg-purple { background: linear-gradient(90deg, #bc13fe, #8a2be2); }
+        .nav-tab { font-size: 12px; font-weight: bold; color: #555; cursor: pointer; }
+        .nav-active { color: #bc13fe; }
+        input { background: #111 !important; border: 1px solid #222 !important; color: white !important; }
     </style>
 </head>
-<body class="max-w-md mx-auto min-h-screen p-4 pb-24">
+<body class="max-w-md mx-auto min-h-screen pb-24 text-center">
 
-    <!-- Cabeçalho -->
-    <header class="flex justify-between items-center py-4">
-        <h1 class="text-3xl font-black italic neon-purple">PIXXX</h1>
-        <div class="text-right">
-            <p class="text-green-400 font-bold">0 Gems</p>
-            <button class="bg-purple text-white text-[10px] px-2 py-1 rounded-full font-bold">RECARREGAR</button>
-        </div>
+    <header class="p-4 border-b border-white/5 sticky top-0 bg-black z-50">
+        <h1 class="text-2xl font-black italic neon-purple tracking-tighter">PIXXX</h1>
+        <div id="display-status" class="text-[10px] text-yellow-500 font-bold mt-1 uppercase tracking-widest font-mono">Sistema Ativo</div>
     </header>
 
-    <!-- Tela da Live -->
-    <div id="video-container" class="video-box shadow-2xl shadow-purple-900/20">
-        <div class="absolute top-4 left-4 bg-red-600 px-2 py-1 rounded text-[10px] font-bold z-10">AO VIVO</div>
-        <div id="placeholder-text" class="absolute inset-0 flex items-center justify-center text-gray-600 text-sm text-center p-8">
-            Aguardando início da transmissão...
+    <div id="tab-live" class="p-4 space-y-4">
+        <div class="w-full h-96 bg-black rounded-[40px] border border-white/10 overflow-hidden relative shadow-2xl">
+            <div id="video-container" class="w-full h-full"></div>
+            <div class="absolute top-4 left-4 bg-red-600 px-2 py-0.5 rounded text-[10px] font-black uppercase">AO VIVO</div>
+        </div>
+        
+        <input id="user-name-input" type="text" placeholder="Escolha seu apelido..." class="w-full bg-gray-900 p-4 rounded-2xl text-sm outline-none border border-white/5 text-center">
+        
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="iniciarLive()" class="bg-purple p-4 rounded-2xl font-bold text-xs uppercase shadow-lg shadow-purple-600/20 text-white">Abrir Câmera</button>
+            <button onclick="entrarLive()" class="bg-gray-800 p-4 rounded-2xl font-bold text-xs border border-white/10 uppercase italic text-white">Entrar</button>
+        </div>
+
+        <div class="bg-gray-900/50 p-4 rounded-3xl border border-white/5 flex justify-between items-center mt-4">
+            <div class="text-left">
+                <p class="text-[9px] text-gray-500 uppercase font-bold tracking-tighter">Saldo Modelo</p>
+                <h3 class="text-xl font-black" id="modelo-saldo">R$ 0,00</h3>
+            </div>
+            <button onclick="alert('Saque mínimo de R$ 30,00')" class="bg-green-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase text-white">Sacar PIX</button>
         </div>
     </div>
 
-    <!-- Campo do Token (Obrigatório porque você ativou o Certificado) -->
-    <div class="mt-4">
-        <label class="text-[10px] text-gray-400 uppercase font-bold">Token Temporário do Agora.io:</label>
-        <input id="token-input" type="text" placeholder="Cole o código 007eJx... aqui" 
-        class="w-full bg-gray-900 border border-gray-800 rounded-lg p-3 mt-1 text-xs text-purple-300 focus:outline-none focus:border-purple-500">
-    </div>
-
-    <!-- Botões de Ação -->
-    <div class="grid grid-cols-2 gap-4 mt-6">
-        <button onclick="iniciarLive()" class="bg-purple hover:opacity-80 text-white p-4 rounded-2xl font-bold uppercase text-xs transition-all">
-            Abrir Câmera<br><span class="text-[9px] opacity-70">(Sou Modelo)</span>
-        </button>
-        <button onclick="entrarLive()" class="bg-gray-800 border border-purple text-white p-4 rounded-2xl font-bold uppercase text-xs transition-all">
-            Assistir Live<br><span class="text-[9px] opacity-70">(Sou Usuário)</span>
-        </button>
-    </div>
-
-    <!-- Painel de Ganhos da Modelo -->
-    <div class="mt-8 bg-gray-900/50 p-5 rounded-3xl border border-gray-800">
-        <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Saldo Acumulado</p>
-        <div class="flex justify-between items-center mt-1">
-            <h2 class="text-3xl font-black text-white">R$ 0,00</h2>
-            <button onclick="alert('O saque de R$ 30,00 estará disponível em breve com a Suitpay!')" 
-            class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-xl text-[10px] font-extrabold transition-colors">
-                SACAR PIX
-            </button>
+    <div id="tab-profile" class="hidden p-8 space-y-4">
+        <div id="login-form">
+            <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 text-center">Gestão do Presidente</h2>
+            <input id="adm-email" type="email" placeholder="E-mail" class="w-full bg-gray-900 p-4 rounded-xl text-sm outline-none border border-white/5 mb-2 text-center">
+            <input id="adm-pass" type="password" placeholder="Senha" class="w-full bg-gray-900 p-4 rounded-xl text-sm outline-none border border-white/5 mb-4 text-center text-white">
+            <button onclick="acessarPainel()" class="w-full bg-gray-800 p-4 rounded-xl text-xs font-black uppercase border border-white/5 text-white">Entrar no Painel</button>
         </div>
-        <p class="text-[9px] text-gray-600 mt-3 font-medium italic">* Mínimo para saque: R$ 30,00. Taxa da plataforma: 25%.</p>
+        
+        <div id="president-dashboard" class="hidden mt-6 p-6 bg-purple rounded-[32px] text-left shadow-2xl">
+            <p class="text-[10px] font-black uppercase opacity-60">Faturamento Real (25%)</p>
+            <h2 class="text-4xl font-black">R$ 0,00</h2>
+            <hr class="my-4 border-white/10">
+            <p class="text-[10px] font-bold text-white uppercase font-mono">● MODO GHOST: ATIVADO</p>
+            <p class="text-[9px] text-white/70 italic leading-tight mt-1">Agora você entra em qualquer live grátis.</p>
+        </div>
     </div>
 
-    <!-- Script de Funcionamento da Live -->
+    <footer class="fixed bottom-0 w-full max-w-md bg-black border-t border-white/5 flex justify-around p-3 z-50">
+        <div onclick="showTab('live')" class="nav-tab nav-active" id="btn-live">🎥 LIVE</div>
+        <div onclick="showTab('profile')" class="nav-tab" id="btn-profile">👤 PERFIL</div>
+    </footer>
+
     <script>
         const client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
-        const appId = "39917ad3d16d40068600abe739047a15"; // Seu App ID já configurado
-        const canal = "canal-pixxx"; // Nome do canal que você deve usar no site do Agora
-        let localTracks = { videoTrack: null, audioTrack: null };
+        const appId = "58b921e58ceb4536b3bca7dd6a12bdba"; 
+        const canal = "canal-pixxx";
 
-        async function iniciarLive() {
-            const token = document.getElementById('token-input').value;
-            if(!token) return alert("Por favor, gere e cole o TOKEN TEMPORÁRIO do site do Agora.io");
+        let isGhostMode = false;
+        const MY_EMAIL = "radamez1228@gmail.com";
+        const MY_PASS = "Ra@$926629";
 
-            try {
-                client.setClientRole("host");
-                await client.join(appId, canal, token, null);
-                
-                localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-                localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack();
-                
-                document.getElementById('placeholder-text').style.display = 'none';
-                localTracks.videoTrack.play("video-container");
-                
-                await client.publish(Object.values(localTracks));
-                alert("SUA LIVE COMEÇOU! Você já pode receber presentes.");
-            } catch (error) {
-                console.error(error);
-                alert("Erro ao iniciar live. Verifique se o Token é válido.");
-            }
+        function showTab(id) {
+            document.getElementById('tab-live').classList.add('hidden');
+            document.getElementById('tab-profile').classList.add('hidden');
+            document.getElementById('tab-' + id).classList.remove('hidden');
+            document.querySelectorAll('.nav-tab').forEach(n => n.classList.remove('nav-active'));
+            document.getElementById('btn-' + id).classList.add('nav-active');
+        }
+
+        function acessarPainel() {
+            const e = document.getElementById('adm-email').value;
+            const p = document.getElementById('adm-pass').value;
+            if(e === MY_EMAIL && p === MY_PASS) {
+                isGhostMode = true;
+                document.getElementById('login-form').classList.add('hidden');
+                document.getElementById('president-dashboard').classList.remove('hidden');
+                document.getElementById('display-status').innerHTML = "PRESIDENTE: MODO GHOST";
+                alert("Olá Presidente Radames!");
+            } else { alert("Acesso Negado."); }
         }
 
         async function entrarLive() {
-            const token = document.getElementById('token-input').value;
-            if(!token) return alert("Por favor, cole o TOKEN para assistir a live.");
+            const nome = document.getElementById('user-name-input').value;
+            if(!nome) return alert("Digite um apelido!");
+            client.setClientRole("audience");
+            await client.join(appId, canal, null, null); 
+            client.on("user-published", async (user, mediaType) => {
+                await client.subscribe(user, mediaType);
+                if (mediaType === "video") user.videoTrack.play("video-container");
+            });
+            alert("Você entrou como: " + nome);
+        }
 
-            try {
-                client.setClientRole("audience");
-                await client.join(appId, canal, token, null);
-                
-                client.on("user-published", async (user, mediaType) => {
-                    await client.subscribe(user, mediaType);
-                    if (mediaType === "video") {
-                        document.getElementById('placeholder-text').style.display = 'none';
-                        user.videoTrack.play("video-container");
-                    }
-                });
-                alert("Você entrou na live! Envie presentes para a modelo.");
-            } catch (error) {
-                alert("Erro ao entrar na live. A modelo pode estar offline ou o token expirou.");
-            }
+        async function iniciarLive() {
+            client.setClientRole("host");
+            await client.join(appId, canal, null, null);
+            const v = await AgoraRTC.createCameraVideoTrack();
+            const a = await AgoraRTC.createMicrophoneAudioTrack();
+            v.play("video-container");
+            await client.publish([v, a]);
+            alert("VOCÊ ESTÁ AO VIVO!");
         }
     </script>
 </body>
