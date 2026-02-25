@@ -3,67 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PIXXX - Oficial</title>
+    <title>PIXXX - O Melhor App de Lives</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.11.0.js"></script>
     <style>
         body { background-color: #050505; color: white; font-family: sans-serif; overflow-x: hidden; }
         .neon-purple { color: #bc13fe; text-shadow: 0 0 15px #bc13fe; }
         .bg-purple { background: linear-gradient(90deg, #bc13fe, #8a2be2); }
-        .nav-tab { font-size: 12px; font-weight: bold; color: #555; cursor: pointer; }
+        .nav-tab { font-size: 10px; font-weight: bold; color: #555; cursor: pointer; text-align: center; }
         .nav-active { color: #bc13fe; }
         input { background: #111 !important; border: 1px solid #222 !important; color: white !important; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
     </style>
 </head>
-<body class="max-w-md mx-auto min-h-screen pb-24 text-center">
+<body class="max-w-md mx-auto min-h-screen pb-24">
 
-    <header class="p-4 border-b border-white/5 sticky top-0 bg-black z-50">
+    <!-- CABEÇALHO -->
+    <header class="p-4 flex justify-between items-center sticky top-0 bg-black/90 z-50 border-b border-white/5">
         <h1 class="text-2xl font-black italic neon-purple tracking-tighter">PIXXX</h1>
-        <div id="display-status" class="text-[10px] text-yellow-500 font-bold mt-1 uppercase tracking-widest font-mono">Sistema Ativo</div>
+        <div class="bg-white/10 px-3 py-1 rounded-full border border-white/10">
+            <span class="text-yellow-500 font-bold text-xs" id="user-balance">0 Gems</span>
+        </div>
     </header>
 
-    <div id="tab-live" class="p-4 space-y-4">
-        <div class="w-full h-96 bg-black rounded-[40px] border border-white/10 overflow-hidden relative shadow-2xl">
+    <!-- TELA 1: INÍCIO (VITRINE) -->
+    <div id="tab-home" class="p-4 space-y-6">
+        <div class="flex justify-between items-center">
+            <h2 class="text-lg font-bold">Explorar Modelos</h2>
+            <span class="text-red-500 text-[10px] font-bold animate-pulse">● 12 ONLINE</span>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div onclick="showTab('live')" class="relative rounded-3xl overflow-hidden aspect-[3/4] glass">
+                <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=400" class="w-full h-full object-cover opacity-70">
+                <div class="absolute bottom-0 p-3 bg-gradient-to-t from-black w-full text-[10px] font-bold">Mih_Vip 🔥</div>
+            </div>
+            <div onclick="showTab('live')" class="relative rounded-3xl overflow-hidden aspect-[3/4] glass">
+                <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=400" class="w-full h-full object-cover opacity-70">
+                <div class="absolute bottom-0 p-3 bg-gradient-to-t from-black w-full text-[10px] font-bold">Letícia_Hot 🔞</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA 2: LIVE (O MOTOR DO VÍDEO) -->
+    <div id="tab-live" class="hidden p-4 space-y-4">
+        <div class="w-full h-96 bg-black rounded-[40px] border border-white/10 overflow-hidden relative shadow-2xl shadow-purple-900/20">
             <div id="video-container" class="w-full h-full"></div>
             <div class="absolute top-4 left-4 bg-red-600 px-2 py-0.5 rounded text-[10px] font-black uppercase">AO VIVO</div>
         </div>
-        
-        <input id="user-name-input" type="text" placeholder="Escolha seu apelido..." class="w-full bg-gray-900 p-4 rounded-2xl text-sm outline-none border border-white/5 text-center">
-        
-        <div class="grid grid-cols-2 gap-3">
-            <button onclick="iniciarLive()" class="bg-purple p-4 rounded-2xl font-bold text-xs uppercase shadow-lg shadow-purple-600/20 text-white">Abrir Câmera</button>
-            <button onclick="entrarLive()" class="bg-gray-800 p-4 rounded-2xl font-bold text-xs border border-white/10 uppercase italic text-white">Entrar</button>
-        </div>
-
-        <div class="bg-gray-900/50 p-4 rounded-3xl border border-white/5 flex justify-between items-center mt-4">
-            <div class="text-left">
-                <p class="text-[9px] text-gray-500 uppercase font-bold tracking-tighter">Saldo Modelo</p>
-                <h3 class="text-xl font-black" id="modelo-saldo">R$ 0,00</h3>
+        <div class="space-y-2">
+            <input id="user-name-input" type="text" placeholder="Escolha seu apelido..." class="w-full p-4 rounded-2xl text-sm outline-none border border-white/5 text-center">
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="iniciarLive()" class="bg-purple p-4 rounded-2xl font-bold text-[10px] uppercase text-white">Abrir Câmera</button>
+                <button onclick="entrarLive()" class="bg-gray-800 p-4 rounded-2xl font-bold text-[10px] border border-white/10 uppercase text-white">Assistir</button>
             </div>
-            <button onclick="alert('Saque mínimo de R$ 30,00')" class="bg-green-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase text-white">Sacar PIX</button>
+        </div>
+        <!-- Barra de Presentes -->
+        <div class="flex justify-between gap-2 overflow-x-auto py-2">
+            <button onclick="alert('Enviou Rosa!')" class="glass p-3 rounded-2xl text-lg">🌹</button>
+            <button onclick="alert('Enviou Beijo!')" class="glass p-3 rounded-2xl text-lg">💋</button>
+            <button onclick="alert('Enviou Champagne!')" class="glass p-3 rounded-2xl text-lg">🍾</button>
+            <button onclick="alert('Enviou Carro!')" class="glass p-3 rounded-2xl text-lg">🏎️</button>
         </div>
     </div>
 
+    <!-- TELA 3: LOJA (GEMS) -->
+    <div id="tab-shop" class="hidden p-6 space-y-4 text-center">
+        <h2 class="text-2xl font-black neon-purple italic">LOJA DE GEMS</h2>
+        <div class="space-y-3">
+            <div class="glass p-5 rounded-3xl flex justify-between items-center">
+                <span class="font-bold text-yellow-500 text-lg">50 Gems</span>
+                <button onclick="alert('Conecte a Suitpay')" class="bg-green-600 px-5 py-2 rounded-xl text-xs font-black text-white italic underline">R$ 50,00</button>
+            </div>
+            <div class="bg-purple p-5 rounded-3xl flex justify-between items-center shadow-lg shadow-purple-900/50">
+                <span class="font-bold text-white text-lg">120 Gems (BÔNUS)</span>
+                <button onclick="alert('Conecte a Suitpay')" class="bg-black/30 px-5 py-2 rounded-xl text-xs font-black text-white italic underline">R$ 100,00</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA 4: PERFIL (PAINEL DO PRESIDENTE OCULTO) -->
     <div id="tab-profile" class="hidden p-8 space-y-4">
-        <div id="login-form">
-            <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 text-center">Gestão do Presidente</h2>
-            <input id="adm-email" type="email" placeholder="E-mail" class="w-full bg-gray-900 p-4 rounded-xl text-sm outline-none border border-white/5 mb-2 text-center">
-            <input id="adm-pass" type="password" placeholder="Senha" class="w-full bg-gray-900 p-4 rounded-xl text-sm outline-none border border-white/5 mb-4 text-center text-white">
-            <button onclick="acessarPainel()" class="w-full bg-gray-800 p-4 rounded-xl text-xs font-black uppercase border border-white/5 text-white">Entrar no Painel</button>
+        <div id="login-form" class="space-y-4">
+            <h2 class="text-xs font-bold text-gray-600 uppercase text-center tracking-widest">Área de Membros</h2>
+            <input id="adm-email" type="email" placeholder="E-mail" class="w-full p-4 rounded-2xl text-sm outline-none">
+            <input id="adm-pass" type="password" placeholder="Senha" class="w-full p-4 rounded-2xl text-sm outline-none">
+            <button onclick="acessarPainel()" class="w-full bg-gray-900 p-4 rounded-2xl text-xs font-black uppercase text-white border border-white/5">Entrar</button>
         </div>
         
-        <div id="president-dashboard" class="hidden mt-6 p-6 bg-purple rounded-[32px] text-left shadow-2xl">
-            <p class="text-[10px] font-black uppercase opacity-60">Faturamento Real (25%)</p>
-            <h2 class="text-4xl font-black">R$ 0,00</h2>
-            <hr class="my-4 border-white/10">
-            <p class="text-[10px] font-bold text-white uppercase font-mono">● MODO GHOST: ATIVADO</p>
-            <p class="text-[9px] text-white/70 italic leading-tight mt-1">Agora você entra em qualquer live grátis.</p>
+        <div id="president-dashboard" class="hidden space-y-6">
+            <div class="p-8 rounded-[40px] bg-purple shadow-2xl">
+                <p class="text-[10px] font-black uppercase opacity-60">Lucro da Plataforma (25%)</p>
+                <h2 class="text-4xl font-black">R$ 0,00</h2>
+            </div>
+            <div class="glass p-5 rounded-3xl space-y-4">
+                <p class="text-[10px] font-black text-gray-500 uppercase">Solicitações de Saque</p>
+                <p class="text-xs italic text-gray-600">Nenhum pedido de saque de R$ 30,00 hoje.</p>
+            </div>
+            <div class="p-4 bg-green-900/20 border border-green-600/30 rounded-2xl">
+                <p class="text-[10px] text-green-500 font-bold uppercase tracking-tighter italic">● Modo Ghost Ativado: Você entra em qualquer live grátis.</p>
+            </div>
         </div>
     </div>
 
-    <footer class="fixed bottom-0 w-full max-w-md bg-black border-t border-white/5 flex justify-around p-3 z-50">
-        <div onclick="showTab('live')" class="nav-tab nav-active" id="btn-live">🎥 LIVE</div>
-        <div onclick="showTab('profile')" class="nav-tab" id="btn-profile">👤 PERFIL</div>
+    <!-- MENU INFERIOR (TABS) -->
+    <footer class="fixed bottom-0 w-full max-w-md bg-black/95 border-t border-white/5 flex justify-around p-3 z-50 backdrop-blur-xl">
+        <div onclick="showTab('home')" class="nav-tab nav-active" id="btn-home"><div class="text-xl">🏠</div>Início</div>
+        <div onclick="showTab('live')" class="nav-tab" id="btn-live"><div class="text-xl">🎥</div>Live</div>
+        <div onclick="showTab('shop')" class="nav-tab" id="btn-shop"><div class="text-xl">💎</div>Moedas</div>
+        <div onclick="showTab('profile')" class="nav-tab" id="btn-profile"><div class="text-xl">👤</div>Perfil</div>
     </footer>
 
     <script>
@@ -71,13 +118,12 @@
         const appId = "58b921e58ceb4536b3bca7dd6a12bdba"; 
         const canal = "canal-pixxx";
 
-        let isGhostMode = false;
         const MY_EMAIL = "radamez1228@gmail.com";
         const MY_PASS = "Ra@$926629";
+        let ghostMode = false;
 
         function showTab(id) {
-            document.getElementById('tab-live').classList.add('hidden');
-            document.getElementById('tab-profile').classList.add('hidden');
+            document.querySelectorAll('[id^="tab-"]').forEach(t => t.classList.add('hidden'));
             document.getElementById('tab-' + id).classList.remove('hidden');
             document.querySelectorAll('.nav-tab').forEach(n => n.classList.remove('nav-active'));
             document.getElementById('btn-' + id).classList.add('nav-active');
@@ -87,10 +133,10 @@
             const e = document.getElementById('adm-email').value;
             const p = document.getElementById('adm-pass').value;
             if(e === MY_EMAIL && p === MY_PASS) {
-                isGhostMode = true;
+                ghostMode = true;
                 document.getElementById('login-form').classList.add('hidden');
                 document.getElementById('president-dashboard').classList.remove('hidden');
-                document.getElementById('display-status').innerHTML = "PRESIDENTE: MODO GHOST";
+                document.getElementById('user-balance').innerHTML = "PRESIDENTE";
                 alert("Olá Presidente Radames!");
             } else { alert("Acesso Negado."); }
         }
