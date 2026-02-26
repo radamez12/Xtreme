@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="notranslate" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="google" content="notranslate">
+    <title>PIXXX - Império Oficial</title>
+    
+    <!-- Bibliotecas (Carregamento Prioritário) -->
+    <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.11.0.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { background: #050505; color: white; font-family: sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        header { padding: 15px; border-bottom: 1px solid #222; background: #000; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .neon { color: #bc13fe; text-shadow: 0 0 10px #bc13fe; font-weight: 900; }
+        .aba { display: none; padding: 15px; text-align: center; padding-bottom: 150px; }
+        .aba-ativa { display: block !important; }
+        footer { position: fixed; bottom: 0; width: 100%; max-width: 448px; background: #000; border-top: 1px solid #222; display: flex; justify-content: space-around; z-index: 1000; padding: 10px 0; padding-bottom: 25px; }
+        .nav-tab { color: #444; font-size: 9px; font-weight: bold; text-align: center; flex: 1; cursor: pointer; }
+        .nav-active { color: #bc13fe !important; border-top: 2px solid #bc13fe; }
+        .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid #333; border-radius: 25px; padding: 15px; margin-bottom: 15px; }
+        .bg-purple { background: linear-gradient(90deg, #bc13fe, #8a2be2); color: white; border-radius: 12px; padding: 15px; font-weight: bold; border: none; width: 100%; cursor: pointer; }
+        input { background: #111 !important; border: 1px solid #333 !important; color: white !important; width: 100%; padding: 12px; border-radius: 10px; margin-bottom: 10px; outline: none; text-align: center; }
+        #v-player { width: 100%; height: 320px; background: #000; border-radius: 35px; border: 1px solid #bc13fe; overflow: hidden; position: relative; }
+    </style>
+
+    <script>
+        // NAVEGAÇÃO IMEDIATA
+        function mudarAba(id) {
+            const abas = ['home', 'roulette', 'live', 'gems', 'gestao'];
+            abas.forEach(a => {
+                document.getElementById('tela-' + a).style.display = 'none';
+                document.getElementById('btn-' + a).classList.remove('nav-active');
+            });
+            document.getElementById('tela-' + id).style.display = 'block';
+            document.getElementById('btn-' + id).classList.add('nav-active');
+            window.scrollTo(0,0);
+        }
+    </script>
+</head>
+<body class="max-w-md mx-auto">
+
+    <!-- PORTÃO DE IDADE -->
+    <div id="age-gate" style="position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 30px; text-align: center;">
+        <div class="glass border-purple-600 w-full" style="padding: 40px;">
+            <h2 class="neon text-3xl mb-4">PIXXX</h2>
+            <p class="text-xs mb-8 text-gray-500 font-bold">VOCÊ TEM +18 ANOS?</p>
+            <button onclick="document.getElementById('age-gate').style.display='none'" class="bg-purple">ENTRAR NO IMPÉRIO</button>
+        </div>
+    </div>
+
+    <header>
+        <h1 class="neon italic text-2xl">PIXXX</h1>
+        <div style="color: #ffcc00; font-weight: bold; font-size: 11px;" id="topo-saldo">0 Gems</div>
+    </header>
+
+    <!-- TELA 1: FEED -->
+    <div id="tela-home" class="aba aba-ativa">
+        <h3 style="font-size: 10px; color: #555; letter-spacing: 2px; margin-bottom: 20px;">EXPLORAR FEED</h3>
+        <div class="glass" onclick="mudarAba('live')">
+            <p style="text-align:left; font-size:12px; font-weight:bold; margin-bottom:10px;">Mih_Vip 🔥</p>
+            <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=400" style="width:100%; border-radius:15px; opacity: 0.6; filter: blur(10px);">
+            <button class="bg-purple" style="margin-top:10px; font-size:10px;">🔓 LIBERAR FEED (10 GEMS)</button>
+        </div>
+    </div>
+
+    <!-- TELA 2: ROLETA -->
+    <div id="tela-roulette" class="aba">
+        <h2 class="neon text-xl uppercase">Roleta da Sorte</h2>
+        <div style="width:180px; height:180px; border-radius:50%; border:4px solid #bc13fe; margin:20px auto; display:flex; align-items:center; justify-content:center; opacity:0.3; font-size:8px;">15 GEMS / GIRO</div>
+        <button onclick="alert('Saldo insuficiente!')" class="bg-purple">GIRAR AGORA</button>
+    </div>
+
+    <!-- TELA 3: LIVE (SISTEMA REAL DE VÍDEO) -->
+    <div id="tela-live" class="aba">
+        <div id="v-player">
+            <div style="position:absolute; top:15px; left:15px; background:red; font-size:8px; font-weight:900; padding:2px 6px; border-radius:5px;">LIVE PROTEGIDA</div>
+        </div>
+        <input id="nick-live" type="text" placeholder="Seu apelido no chat...">
+        <div style="display: grid; grid-template-cols: 1fr 1fr; gap: 10px; margin-bottom:10px;">
+            <button onclick="startAction('camera')" class="bg-purple" style="font-size:10px;">🎥 CÂMERA</button>
+            <button onclick="startAction('game')" class="bg-purple" style="background:#ff4500; font-size:10px;">🎮 JOGOS</button>
+        </div>
+        <button onclick="startAction('watch')" style="width:100%; background:#111; color:white; border:1px solid #333; padding:15px; border-radius:15px; font-weight:bold; font-size:10px;">ASSISTIR TRANSMISSÃO</button>
+    </div>
+
+    <!-- TELA 4: GEMS -->
+    <div id="tela-gems" class="aba">
+        <h2 class="neon text-xl mb-6">LOJA DE GEMS</h2>
+        <div style="display: grid; grid-template-cols: 1fr 1fr; gap: 10px;">
+            <div onclick="document.getElementById('px-box').style.display='block'" class="glass" style="cursor:pointer;">R$ 10,00</div>
+            <div onclick="document.getElementById('px-box').style.display='block'" class="glass" style="cursor:pointer; border-color:#bc13fe;">R$ 100,00</div>
+        </div>
+        <div id="px-box" style="display:none;" class="glass border-green-600 mt-4">
+            <p style="color: #00ff00; font-size:9px; font-weight:bold;">PIX PRESIDENTE:</p>
+            <p style="font-size:10px; margin:10px 0;">0f549cdb-6acb-4af9-bd96-890360d4cdf8</p>
+            <button onclick="window.open('https://wa.me/5567981251773')" class="bg-purple" style="background:white; color:black; font-size:10px;">PAGUEI! LIBERAR</button>
+        </div>
+    </div>
+
+    <!-- TELA 5: GESTÃO -->
+    <div id="tela-gestao" class="aba">
+        <div id="login-adm-box">
+            <input id="e-adm" type="text" placeholder="E-mail Gestão">
+            <input id="s-adm" type="password" placeholder="Senha">
+            <button onclick="logar()" class="bg-purple">ENTRAR NO PAINEL</button>
+            <p onclick="alert('Saque mínimo R$ 100')" style="font-size:9px; color:#555; text-decoration:underline; margin-top:20px; font-weight:bold;">SOLICITAR SAQUE MODELO</p>
+        </div>
+        <div id="painel" style="display:none; text-align: left;">
+            <div class="glass" style="background:#bc13fe; padding:30px;">
+                <h2 id="estoque-label" style="font-size:22px; font-weight:900;">100.000.000 GEMS</h2>
+            </div>
+            <div class="glass" style="margin-top:10px;">
+                <input id="l-nick" type="text" placeholder="Apelido Cliente">
+                <input id="l-qtd" type="number" placeholder="Quantidade">
+                <button onclick="liberar()" class="bg-purple" style="background:#28a745;">LIBERAR GEMS</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div id="btn-home" onclick="mudarAba('home')" class="nav-tab nav-active">🏠<br>Início</div>
+        <div id="btn-roulette" onclick="mudarAba('roulette')" class="nav-tab">🎡<br>Sorte</div>
+        <div id="btn-live" onclick="mudarAba('live')" class="nav-tab">🎥<br>Live</div>
+        <div id="btn-shop" onclick="mudarAba('gems')" class="nav-tab">💎<br>Gems</div>
+        <div id="btn-gestao" onclick="mudarAba('gestao')" class="nav-tab">👤<br>Gestão</div>
+    </footer>
+
+    <script>
+        const _URL = 'https://uwjbmxxehcxaow.supabase.co';
+        const _KEY = 'sb_publishable_cvsGGsWffdopP6ooo3Vqjw_D71XLKft';
+        const supabase = supabase.createClient(_URL, _KEY);
+        const appId = "58b921e58ceb4536b3bca7dd6a12bdba";
+        
+        let client;
+        let tracks = {v: null, a: null};
+
+        function logar() {
+            const e = document.getElementById('e-adm').value;
+            const s = document.getElementById('s-adm').value;
+            if(e === "radamez1228@gmail.com" && s === "Ra@$926629") {
+                document.getElementById('login-adm-box').style.display = 'none';
+                document.getElementById('painel').style.display = 'block';
+                document.getElementById('topo-saldo').innerText = "PRESIDENTE";
+            }
+        }
+
+        async function liberar() {
+            const n = document.getElementById('l-nick').value;
+            const q = document.getElementById('l-qtd').value;
+            await supabase.from('usuarios').upsert({ apelido: n, gems: q }, { onConflict: 'apelido' });
+            alert("SUCESSO!");
+        }
+
+        // LIGA O MOTOR DE VÍDEO SÓ QUANDO CLICA
+        async function startAction(modo) {
+            if(!client) client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
+            
+            try {
+                await client.join(appId, "canal-pixxx", null, null);
+                if(modo === 'watch') {
+                    client.on("user-published", async (u, m) => {
+                        await client.subscribe(u, m);
+                        if(m === "video") u.videoTrack.play("v-player");
+                    });
+                    alert("Assistindo!");
+                } else {
+                    tracks.a = await AgoraRTC.createMicrophoneAudioTrack();
+                    tracks.v = (modo === 'camera') ? await AgoraRTC.createCameraVideoTrack() : await AgoraRTC.createScreenVideoTrack();
+                    tracks.v.play("v-player");
+                    await client.publish([tracks.a, tracks.v]);
+                    alert("AO VIVO!");
+                }
+            } catch(e) { alert("Dê permissão para a câmera!"); }
+        }
+    </script>
+</body>
+</html>
