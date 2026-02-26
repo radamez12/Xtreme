@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="notranslate" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="google" content="notranslate">
+    <title>PIXXX - Império Oficial</title>
+    <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.11.0.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #050505; color: white; font-family: sans-serif; margin: 0; overflow-x: hidden; }
+        .neon-purple { color: #bc13fe; text-shadow: 0 0 10px #bc13fe; font-weight: 900; }
+        .aba-conteudo { display: none; padding: 15px; text-align: center; padding-bottom: 150px; }
+        .aba-ativa { display: block !important; }
+        footer { position: fixed; bottom: 0; width: 100%; max-width: 448px; background: #000; border-top: 1px solid #222; display: flex; justify-content: space-around; z-index: 1000; padding: 10px 0; }
+        .nav-tab { color: #444; font-size: 9px; font-weight: bold; text-align: center; flex: 1; cursor: pointer; }
+        .nav-active { color: #bc13fe !important; border-top: 2px solid #bc13fe; }
+        .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid #333; border-radius: 25px; padding: 15px; }
+        .bg-purple { background: linear-gradient(90deg, #bc13fe, #8a2be2); color: white; border-radius: 12px; padding: 15px; font-weight: bold; border: none; width: 100%; cursor: pointer; }
+        input { background: #111 !important; border: 1px solid #333 !important; color: white !important; width: 100%; padding: 12px; border-radius: 12px; margin-bottom: 10px; outline: none; }
+    </style>
+</head>
+<body class="max-w-md mx-auto">
+
+    <div id="age-gate" style="position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 30px; text-align: center;">
+        <div class="glass border-purple-600 w-full" style="padding: 40px;">
+            <h2 class="text-4xl font-black neon-purple mb-4">PIXXX</h2>
+            <button onclick="document.getElementById('age-gate').style.display='none'" class="bg-purple">ENTRAR NO IMPÉRIO (+18)</button>
+        </div>
+    </div>
+
+    <header class="p-4 border-b border-white/5 sticky top-0 bg-black z-50 flex justify-between items-center">
+        <h1 class="text-2xl font-black italic neon-purple tracking-tighter">PIXXX</h1>
+        <div class="bg-white/5 px-4 py-1 rounded-full border border-white/10 text-yellow-500 font-bold text-xs" id="display-balance">0 Gems</div>
+    </header>
+
+    <!-- TELA 1: FEED -->
+    <div id="tela-home" class="aba-conteudo aba-ativa">
+        <div class="glass" onclick="mudarAba('live')">
+            <p style="text-align:left; font-size:12px; font-weight:bold; margin-bottom:10px;">Leticia_Hot 🔞</p>
+            <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=400" style="width:100%; border-radius:15px; filter: blur(15px); opacity: 0.5;">
+            <button onclick="comprarConteudo(10)" class="bg-purple mt-4">🔓 DESBLOQUEAR (10 GEMS)</button>
+        </div>
+    </div>
+
+    <!-- TELA 2: ROLETA -->
+    <div id="tela-roulette" class="aba-conteudo">
+        <h2 class="neon-purple text-xl mb-10">ROLETA DA SORTE</h2>
+        <div id="wheel" style="width:200px; height:200px; border-radius:50%; border:4px solid #bc13fe; margin:0 auto; display:flex; align-items:center; justify-content:center; transition: 4s;">
+            <span style="opacity:0.3; font-size:10px;">SORTE OU AZAR</span>
+        </div>
+        <button onclick="jogarRoleta()" class="bg-purple mt-10">GIRAR (15 GEMS)</button>
+    </div>
+
+    <!-- TELA 3: LIVE -->
+    <div id="tela-live" class="aba-conteudo">
+        <div style="width:100%; height:320px; background:black; border-radius:35px; border:1px solid #333; overflow:hidden; margin-bottom:15px; position:relative;">
+            <div id="video-player" style="width:100%; height:100%;"></div>
+        </div>
+        <input id="input-nick" type="text" placeholder="Seu apelido..." class="text-center">
+        <div style="display: grid; grid-template-cols: 1fr 1fr; gap: 10px;">
+            <button onclick="startVideo('camera')" class="bg-purple">🎥 CÂMERA</button>
+            <button onclick="startVideo('game')" class="bg-orange-600">🎮 JOGOS</button>
+        </div>
+    </div>
+
+    <!-- TELA 4: GEMS (LOJA) -->
+    <div id="tela-shop" class="aba-conteudo">
+        <h2 class="neon-purple text-xl mb-6 italic">LOJA DE GEMS</h2>
+        <div style="display: grid; grid-template-cols: 1fr 1fr; gap: 10px;" id="shop-grid"></div>
+        <div id="pix-area" style="display:none;" class="glass border-green-600 animate-pulse mt-4">
+            <p style="color:#00ff00; font-size:9px; font-weight:bold;">CHAVE PIX PRESIDENTE:</p>
+            <p style="font-size:11px; margin:10px 0;">0f549cdb-6acb-4af9-bd96-890360d4cdf8</p>
+            <button onclick="window.open('https://wa.me/5567981251773')" class="bg-white text-black py-3 rounded-xl font-black uppercase text-[10px] w-full">JÁ PAGUEI! LIBERAR</button>
+        </div>
+    </div>
+
+    <!-- TELA 5: GESTÃO -->
+    <div id="tela-gestao" class="aba-conteudo">
+        <div id="login-box">
+            <input id="e-adm" type="text" placeholder="E-mail Gestão">
+            <input id="s-adm" type="password" placeholder="Senha">
+            <button onclick="logar()" class="bg-purple">ENTRAR NO PAINEL</button>
+        </div>
+        <div id="painel" style="display:none; text-align: left;">
+            <div class="glass" style="background:#bc13fe; padding:30px;">
+                <p style="font-size:8px; font-weight:bold;">ESTOQUE INFINITO</p>
+                <h2 id="estoque-label" style="font-size:20px; font-weight:900;">100.000.000 GEMS</h2>
+            </div>
+            <div class="glass mt-4">
+                <input id="l-nick" type="text" placeholder="Apelido do Cliente">
+                <input id="l-qtd" type="number" placeholder="Quantidade">
+                <button onclick="liberarGemsReal()" class="bg-purple" style="background:#28a745;">LIBERAR E SALVAR</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div onclick="mudarAba('home')" class="nav-tab nav-active" id="btn-home">🏠<br>Feed</div>
+        <div onclick="mudarAba('roulette')" class="nav-tab" id="btn-roulette">🎡<br>Sorte</div>
+        <div onclick="mudarAba('live')" class="nav-tab" id="btn-live">🎥<br>Live</div>
+        <div onclick="mudarAba('shop')" class="nav-tab" id="btn-shop">💎<br>Gems</div>
+        <div onclick="mudarAba('gestao')" class="nav-tab" id="btn-gestao">👤<br>Gestão</div>
+    </footer>
+
+    <script>
+        const _URL = 'https://uwjbmxxehcxaow.supabase.co';
+        const _KEY = 'sb_publishable_cvsGGsWffdopP6ooo3Vqjw_D71XLKft';
+        const supabase = supabase.createClient(_URL, _KEY);
+        const appId = "58b921e58ceb4536b3bca7dd6a12bdba";
+        const client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
+
+        let saldoLocal = 0;
+
+        function mudarAba(id) {
+            const abas = ['home', 'roulette', 'live', 'shop', 'gestao'];
+            abas.forEach(a => {
+                document.getElementById('tela-' + a).style.display = 'none';
+                document.getElementById('btn-' + a).classList.remove('nav-active');
+            });
+            document.getElementById('tela-' + id).style.display = 'block';
+            document.getElementById('btn-' + id).classList.add('nav-active');
+            
+            // Toda vez que mudar de aba, o sistema busca o saldo real no banco
+            checarSaldoReal();
+        }
+
+        async function checarSaldoReal() {
+            const nick = document.getElementById('input-nick').value;
+            if(!nick) return;
+            const { data } = await supabase.from('usuarios').select('gems').eq('apelido', nick).single();
+            if(data) {
+                saldoLocal = data.gems;
+                document.getElementById('display-balance').innerText = saldoLocal + " Gems";
+            }
+        }
+
+        async function liberarGemsReal() {
+            const n = document.getElementById('l-nick').value;
+            const q = parseInt(document.getElementById('l-qtd').value);
+            const { error } = await supabase.from('usuarios').upsert({ apelido: n, gems: q }, { onConflict: 'apelido' });
+            if(!error) alert("GEMS SALVAS NO BANCO!");
+        }
+
+        function logar() {
+            if(document.getElementById('e-adm').value === "radamez1228@gmail.com") {
+                document.getElementById('login-box').style.display = 'none';
+                document.getElementById('painel').style.display = 'block';
+            }
+        }
+
+        async function startVideo(modo) {
+            await client.join(appId, "canal-pixxx", null, null);
+            const a = await AgoraRTC.createMicrophoneAudioTrack();
+            let v = modo === 'camera' ? await AgoraRTC.createCameraVideoTrack() : await AgoraRTC.createScreenVideoTrack();
+            v.play("video-player");
+            await client.publish([a, v]);
+        }
+
+        const grid = document.getElementById('shop-grid');
+        [10, 20, 50, 100].forEach(v => {
+            grid.innerHTML += `<div onclick="document.getElementById('pix-area').style.display='block'" class="glass" style="cursor:pointer;">R$ ${v}</div>`;
+        });
+    </script>
+</body>
+          </html>
