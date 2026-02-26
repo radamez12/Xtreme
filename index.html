@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="notranslate" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="google" content="notranslate">
+    <title>PIXXX - Império Oficial</title>
+    
+    <!-- Bibliotecas: Vídeo, Banco de Dados e Design -->
+    <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.11.0.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { background-color: #050505; color: white; font-family: sans-serif; margin: 0; padding: 0; overflow-x: hidden; user-select: none; }
+        header { padding: 15px; border-bottom: 1px solid #222; position: sticky; top: 0; background: #000; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+        .neon-purple { color: #bc13fe; text-shadow: 0 0 10px #bc13fe; font-weight: 900; }
+        .aba-conteudo { display: none; padding: 15px; text-align: center; padding-bottom: 150px; }
+        .aba-ativa { display: block !important; }
+        footer { position: fixed; bottom: 0; width: 100%; max-width: 448px; background: #000; border-top: 1px solid #222; display: flex; justify-content: space-around; z-index: 1000; padding: 10px 0; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-tab { color: #444; font-size: 9px; font-weight: bold; text-align: center; flex: 1; cursor: pointer; }
+        .nav-active { color: #bc13fe !important; border-top: 2px solid #bc13fe; }
+        .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; padding: 15px; margin-bottom: 15px; }
+        .bg-purple { background: linear-gradient(90deg, #bc13fe, #8a2be2); color: white; border-radius: 15px; padding: 15px; font-weight: bold; border: none; width: 100%; cursor: pointer; }
+        input { background: #111 !important; border: 1px solid #333 !important; color: white !important; width: 100%; padding: 12px; border-radius: 12px; margin-bottom: 10px; outline: none; }
+        .wheel { width: 220px; height: 220px; border-radius: 50%; border: 4px solid #bc13fe; margin: 20px auto; transition: 4s cubic-bezier(0.15, 0, 0.15, 1); background: #000; display: flex; align-items: center; justify-content: center; }
+        .blur-photo { filter: blur(25px); opacity: 0.5; }
+        #ghost-tag { position: fixed; top: 10px; right: 10px; background: #00ff00; color: black; font-size: 7px; padding: 2px 5px; border-radius: 10px; font-weight: 900; z-index: 999; }
+    </style>
+
+    <script>
+        function mudarAba(id) {
+            const abas = ['home', 'roulette', 'live', 'gems', 'gestao'];
+            abas.forEach(a => {
+                document.getElementById('tela-' + a).style.display = 'none';
+                document.getElementById('btn-' + a).classList.remove('nav-active');
+            });
+            document.getElementById('tela-' + id).style.display = 'block';
+            document.getElementById('btn-' + id).classList.add('nav-active');
+            window.scrollTo(0,0);
+        }
+    </script>
+</head>
+<body class="max-w-md mx-auto min-h-screen">
+
+    <div id="ghost-tag" class="hidden animate-pulse">● MODO GHOST</div>
+
+    <div id="age-gate" style="position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 30px; text-align: center;">
+        <div class="glass border-purple-600 w-full" style="padding: 40px;">
+            <h2 class="text-4xl font-black neon-purple mb-4">PIXXX</h2>
+            <p class="text-xs mb-8 text-gray-500 font-bold uppercase">Acesso apenas para maiores de 18 anos.</p>
+            <button onclick="document.getElementById('age-gate').style.display='none'" class="bg-purple uppercase italic tracking-widest">Entrar no Império</button>
+        </div>
+    </div>
+
+    <header>
+        <h1 class="text-2xl font-black neon-purple italic">PIXXX</h1>
+        <div style="color: #ffcc00; font-weight: bold; font-size: 11px;" id="topo-saldo">0 Gems</div>
+    </header>
+
+    <!-- TELA 1: FEED PRIVADO -->
+    <div id="tela-home" class="aba-conteudo aba-ativa">
+        <h3 style="font-size: 10px; color: #555; letter-spacing: 2px; margin-bottom: 20px; font-weight: 900;">EXPLORAR FEED</h3>
+        <div class="glass" onclick="mudarAba('live')">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px; text-align: left;">
+                <div style="width:30px; height:30px; border-radius:50%; background:#bc13fe;"></div>
+                <span style="font-weight:bold; font-size:12px;">Mih_Vip 🔥</span>
+            </div>
+            <div style="position:relative; width:100%; height:320px; background:#000; border-radius:20px; overflow:hidden;">
+                <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=500" class="blur-photo" style="width:100%; height:100%; object-fit:cover;">
+                <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                    <button class="bg-purple" style="width:auto; padding:10px 20px; font-size:10px;">🔓 VER POR 10 GEMS</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA 2: ROLETA -->
+    <div id="tela-roulette" class="aba-conteudo">
+        <h2 class="text-2xl font-black neon-purple uppercase italic">Roleta da Sorte</h2>
+        <p class="text-[9px] text-gray-500 mb-4 font-bold uppercase">Custo do Giro: 15 Gems</p>
+        <div class="relative">
+            <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); z-index: 10; font-size: 20px;">⬇️</div>
+            <div id="wheel" class="wheel">
+                <div style="font-size: 7px; opacity: 0.3; font-weight: 900;">5 | 30 | 250 | 10</div>
+            </div>
+        </div>
+        <button onclick="girarRoleta()" class="bg-purple uppercase italic tracking-widest">GIRAR AGORA</button>
+    </div>
+
+    <!-- TELA 3: LIVE (CÂMERA E JOGOS) -->
+    <div id="tela-live" class="aba-conteudo">
+        <div style="width: 100%; height: 350px; background: black; border-radius: 40px; border: 1px solid #222; overflow: hidden; margin-bottom: 15px; position: relative;">
+            <div id="video-player" style="width:100%; height:100%;"></div>
+            <div id="bunny-ears" style="display:none; position: absolute; inset: 0; align-items: center; justify-content: center; font-size: 60px; pointer-events: none; margin-top: -160px;">🐰</div>
+            <div style="position: absolute; top: 15px; left: 15px; background: red; font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 5px;">LIVE SEGURA</div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 mb-4">
+            <button onclick="document.getElementById('video-player').style.filter='saturate(1.8)'" class="glass text-[8px] font-black uppercase">✨ PELE DIVA</button>
+            <button onclick="document.getElementById('bunny-ears').style.display='flex'" class="glass text-[8px] font-black uppercase">🐰 ORELHAS</button>
+        </div>
+        <input id="input-nick" type="text" placeholder="Seu apelido no chat...">
+        <div style="display: grid; grid-template-cols: 1fr 1fr; gap: 10px;">
+            <button onclick="startTransmissao('camera')" class="bg-purple" style="font-size: 9px;">🎥 CÂMERA</button>
+            <button onclick="startTransmissao('game')" class="bg-purple" style="background:#ff4500; font-size: 9px;">🎮 TRANSMITIR JOGO</button>
+        </div>
+        <button onclick="assistir()" style="width: 100%; background: #111; color: white; padding: 15px; border-radius: 15px; margin-top: 10px; font-weight: bold; border: 1px solid #333; font-size: 10px;">ASSISTIR TRANSMISSÃO</button>
+    </div>
+
+    <!-- TELA 4: SHOP (LOJA DE 5 EM 5) -->
+    <div id="tela-gems" class="aba-conteudo">
+        <h2 class="neon-purple text-xl mb-6 italic">LOJA DE GEMS</h2>
+        <div style="display: grid; grid-template-cols: 1fr 1fr 1fr; gap: 8px;" id="loja-real">
+             <!-- Gerado automaticamente -->
+        </div>
+        <div id="pix-area" style="display:none;" class="glass border-green-600 animate-pulse mt-4">
+            <p style="color: #00ff00; font-size:9px; font-weight:bold; margin-bottom:10px;">CHAVE PIX DO PRESIDENTE:</p>
+            <p style="font-size:10px; font-weight:bold; color:white;" id="pix-display">0f549cdb-6acb-4af9-bd96-890360d4cdf8</p>
+            <button onclick="notificarWhats()" class="bg-purple" style="background:white; color:black; font-size:10px; margin-top:15px; border-radius: 10px;">JÁ PAGUEI! LIBERAR GEMS</button>
+        </div>
+    </div>
+
+    <!-- TELA 5: GESTÃO -->
+    <div id="tela-gestao" class="aba-conteudo">
+        <div id="login-adm-box">
+            <h3 style="color:#666; font-size:9px; margin-bottom:20px; font-weight: 900; tracking-widest">ACESSO RESTRITO GESTÃO</h3>
+            <input id="email-adm" type="text" placeholder="E-mail ou Usuário VIP">
+            <div style="position:relative;">
+                <input id="pass-adm" type="password" placeholder="Senha Secreta">
+                <span onclick="tglPass()" style="position:absolute; right:15px; top:12px; cursor:pointer;">👁️</span>
+            </div>
+            <button onclick="entrarNoPainel()" class="bg-purple">ENTRAR NO PAINEL</button>
+            <hr style="border:0; border-top:1px solid #222; margin:30px 0;">
+            <p onclick="recuperar()" style="font-size:9px; color:#555; text-decoration:underline; font-weight:bold; cursor:pointer;">ESQUECI A SENHA / SAQUE MODELO</p>
+        </div>
+
+        <div id="painel-dono" style="display:none; text-align: left;">
+            <div class="glass" style="background:#bc13fe; color:white; padding:30px;">
+                <p style="font-size:9px; font-weight:bold; opacity:0.7;" id="label-estoque">SEU ESTOQUE</p>
+                <h2 id="estoque-label" style="font-size:22px; font-weight:900;">100.000.000 GEMS</h2>
+                <div style="font-size:7px; font-weight:900; margin-top:10px; background:black; display:inline-block; padding:3px 8px; border-radius:10px;">SAQUE MÍNIMO: R$ 100,00</div>
+            </div>
+            <div class="glass" style="margin-top:10px;">
+                <p style="font-size:9px; font-weight:bold; color:#bc13fe; margin-bottom:10px;">LIBERAR MOEDAS</p>
+                <input id="l-nick" type="text" placeholder="Apelido do Cliente">
+                <input id="l-qtd" type="number" placeholder="Quantidade">
+                <button onclick="liberarNoSupabase()" class="bg-purple" style="background:#28a745;">CONFIRMAR E SALVAR NO BANCO</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div id="btn-home" onclick="mudarAba('home')" class="nav-tab nav-active">🏠<br>Feed</div>
+        <div id="btn-roulette" onclick="mudarAba('roulette')" class="nav-tab">🎡<br>Sorte</div>
+        <div id="btn-live" onclick="mudarAba('live')" class="nav-tab">🎥<br>Live</div>
+        <div id="btn-shop" onclick="mudarAba('gems')" class="nav-tab">💎<br>Gems</div>
+        <div id="btn-gestao" onclick="mudarAba('gestao')" class="nav-tab">👤<br>Gestão</div>
+    </footer>
+
+    <script>
+        const _URL = 'https://uwjbmxxehcxaow.supabase.co';
+        const _KEY = 'sb_publishable_cvsGGsWffdopP6ooo3Vqjw_D71XLKft';
+        const supabase = supabase.createClient(_URL, _KEY);
+        const appId = "58b921e58ceb4536b3bca7dd6a12bdba";
+        const client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
+        let tracks = { v: null, a: null };
+        let estoque = 100000000;
+
+        const grid = document.getElementById('loja-real');
+        [5, 10, 15, 20, 25, 30, 35, 40, 50, 100].forEach(v => {
+            grid.innerHTML += `<div onclick="document.getElementById('pix-area').style.display='block'" class="glass" style="padding:10px; cursor:pointer; font-size:11px;"><b>R$ ${v}</b><br><small style="color:#bc13fe;">Gems</small></div>`;
+        });
+
+        function tglPass() { const p = document.getElementById('pass-adm'); p.type = p.type === 'password' ? 'text' : 'password'; }
+        
+        function entrarNoPainel() {
+            const u = document.getElementById('email-adm').value;
+            const s = document.getElementById('pass-adm').value;
+            const vips = ["px_user_882", "br_vendas_99", "suporte_alpha", "master_px01", "tech_br_vagas", "cliente_vip_92", "gestor_moedas", "px_financeiro", "central_br24", "moderador_x"];
+            if(u === "radamez1228@gmail.com" && s === "Ra@$926629") {
+                document.getElementById('login-adm-box').style.display = 'none';
+                document.getElementById('painel-dono').style.display = 'block';
+                document.getElementById('topo-saldo').innerText = "PRESIDENTE";
+                document.getElementById('ghost-tag').style.display = 'block';
+            } else if (vips.includes(u) && s === "PIXXX2024") {
+                document.getElementById('login-adm-box').style.display = 'none';
+                document.getElementById('painel-dono').style.display = 'block';
+                document.getElementById('estoque-label').innerText = "20.000 GEMS";
+                document.getElementById('topo-saldo').innerText = "VENDEDOR";
+                document.getElementById('label-estoque').innerText = "ESTOQUE FUNCIONÁRIO";
+            } else { alert("Dados incorretos."); }
+        }
+
+        async function liberarNoSupabase() {
+            const n = document.getElementById('l-nick').value;
+            const q = parseInt(document.getElementById('l-qtd').value);
+            const { error } = await supabase.from('usuarios').upsert({ apelido: n, gems: q }, { onConflict: 'apelido' });
+            if(!error) {
+                estoque -= q;
+                if(estoque <= 0) estoque = 200000000;
+                document.getElementById('estoque-label').innerText = estoque.toLocaleString() + " GEMS";
+                alert("SUCESSO! O Banco foi atualizado.");
+            }
+        }
+
+        function girarRoleta() {
+            const w = document.getElementById('wheel');
+            w.style.transform = `rotate(${Math.floor(Math.random()*360)+3600}deg)`;
+            setTimeout(() => { alert("Você ganhou! Chame o Presidente no WhatsApp."); }, 4000);
+        }
+
+        function notificarWhats() {
+            const n = document.getElementById('input-nick').value || "Anônimo";
+            window.open("https://wa.me/5567981251773?text=Oi Presidente! Fiz o PIX agora. Apelido: ["+n+"]. Libera minhas Gems?");
+        }
+
+        function recuperar() {
+            const d = prompt("Digite seu E-mail ou Celular:");
+            if(d) alert("Solicitação enviada ao Presidente!");
+        }
+
+        async function startTransmissao(modo) {
+            await client.join(appId, "canal-pixxx", null, null);
+            tracks.a = await AgoraRTC.createMicrophoneAudioTrack();
+            tracks.v = modo === 'camera' ? await AgoraRTC.createCameraVideoTrack() : await AgoraRTC.createScreenVideoTrack();
+            tracks.v.play("video-player");
+            await client.publish([tracks.a, tracks.v]);
+            alert("VOCÊ ESTÁ AO VIVO!");
+        }
+
+        async function assistir() {
+            await client.join(appId, "canal-pixxx", null, null);
+            client.on("user-published", async (u, m) => {
+                await client.subscribe(u, m);
+                if(m === "video") u.videoTrack.play("video-player");
+            });
+        }
+
+        function initApp() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('ref')) {
+                document.getElementById('topo-saldo').innerText = "10 Gems";
+                alert("Brinde de 10 Gems recebido por indicação!");
+            }
+        }
+    </script>
+</body>
+</html>
