@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="notranslate" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="google" content="notranslate">
+    <title>PIXXX - Mobile App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.11.0.js"></script>
+    <style>
+        body { background: #000; color: white; font-family: sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        .aba { display: none; padding: 20px; text-align: center; padding-bottom: 120px; }
+        .aba-ativa { display: block !important; }
+        footer { position: fixed; bottom: 0; width: 100%; max-width: 448px; background: #000; border-top: 1px solid #222; display: flex; justify-content: space-around; z-index: 1000; padding: 10px 0; }
+        .nav-tab { color: #444; font-size: 10px; font-weight: bold; text-align: center; flex: 1; cursor: pointer; }
+        .nav-active { color: #bc13fe !important; border-top: 2px solid #bc13fe; }
+        .bg-purple { background: linear-gradient(90deg, #bc13fe, #8a2be2); color: white; border-radius: 12px; padding: 15px; font-weight: bold; border: none; width: 100%; cursor: pointer; }
+        .glass { background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 20px; padding: 15px; margin-bottom: 15px; }
+        input { background: #111; border: 1px solid #333; color: white; width: 100%; padding: 12px; border-radius: 10px; margin-bottom: 10px; outline: none; }
+    </style>
+</head>
+<body class="max-w-md mx-auto">
+
+    <!-- AVISO 18 ANOS -->
+    <div id="age-gate" style="position: fixed; inset: 0; background: #000; z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; text-align: center;">
+        <div class="glass border-purple-600 w-full">
+            <h1 style="color:#bc13fe; font-size:30px; font-weight:900; margin-bottom:10px;">PIXXX</h1>
+            <p style="font-size:12px; margin-bottom:20px; color:#aaa;">Você tem mais de 18 anos?</p>
+            <button onclick="document.getElementById('age-gate').style.display='none'" class="bg-purple">SIM, TENHO +18</button>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header style="padding:15px; border-bottom:1px solid #222; display:flex; justify-content:space-between; align-items:center;">
+        <h1 style="color:#bc13fe; font-weight:900; font-style:italic;">PIXXX</h1>
+        <div style="color:#ffcc00; font-weight:bold; font-size:12px;">0 Gems</div>
+    </header>
+
+    <!-- TELA 1: HOME -->
+    <div id="tela-home" class="aba aba-ativa">
+        <div class="glass" onclick="mudar('live')">
+            <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=400" style="width:100%; border-radius:15px; opacity:0.6;">
+            <p style="margin-top:10px; font-weight:bold;">Mih_Vip 🔥</p>
+            <button class="bg-purple" style="padding:10px; font-size:10px; margin-top:10px;">🔓 DESBLOQUEAR FEED</button>
+        </div>
+    </div>
+
+    <!-- TELA 2: ROLETA -->
+    <div id="tela-sorte" class="aba text-center">
+        <h2 style="color:#bc13fe; font-weight:900; margin-bottom:20px;">ROLETA DA SORTE</h2>
+        <div style="width:200px; height:200px; border-radius:50%; border:4px solid #bc13fe; margin:20px auto; display:flex; align-items:center; justify-content:center; opacity:0.3;">15 GEMS POR GIRO</div>
+        <button onclick="alert('Giro sem saldo')" class="bg-purple">GIRAR AGORA</button>
+    </div>
+
+    <!-- TELA 3: LIVE -->
+    <div id="tela-live" class="aba">
+        <div style="width:100%; height:300px; background:black; border-radius:30px; border:1px solid #bc13fe; overflow:hidden; margin-bottom:15px; position:relative;">
+            <div id="video-player" style="width:100%; height:100%;"></div>
+            <div style="position:absolute; top:10px; left:10px; background:red; font-size:8px; font-weight:900; padding:2px 5px; border-radius:5px;">LIVE SEGURA</div>
+        </div>
+        <input id="n-live" type="text" placeholder="Seu apelido..." style="text-align:center;">
+        <div style="display:grid; grid-template-cols: 1fr 1fr; gap:10px;">
+            <button onclick="alert('Abrindo Câmera')" class="bg-purple" style="font-size:10px;">🎥 CÂMERA</button>
+            <button onclick="alert('Jogos On')" class="bg-purple" style="background:#ff4500; font-size:10px;">🎮 JOGOS</button>
+        </div>
+        <button onclick="alert('Conectando...')" style="width:100%; background:#111; color:white; padding:15px; border-radius:15px; margin-top:10px; border:1px solid #333; font-weight:bold;">ASSISTIR</button>
+    </div>
+
+    <!-- TELA 4: GEMS -->
+    <div id="tela-shop" class="aba">
+        <h2 style="color:#bc13fe; font-weight:900; margin-bottom:20px;">LOJA DE MOEDAS</h2>
+        <div style="display:grid; grid-template-cols: 1fr 1fr; gap:10px;">
+            <div onclick="document.getElementById('pix-box').style.display='block'" class="glass">R$ 10,00</div>
+            <div onclick="document.getElementById('pix-box').style.display='block'" class="glass" style="border-color:#bc13fe;">R$ 100,00</div>
+        </div>
+        <div id="pix-box" style="display:none; margin-top:20px;" class="glass border-green-600 animate-pulse">
+            <p style="color:#00ff00; font-size:10px;">CHAVE PIX PRESIDENTE:</p>
+            <p style="font-size:11px; margin:10px 0;">0f549cdb-6acb-4af9-bd96-890360d4cdf8</p>
+            <button onclick="window.open('https://wa.me/5567981251773')" class="bg-purple" style="background:white; color:black; font-size:10px;">PAGUEI! LIBERAR</button>
+        </div>
+    </div>
+
+    <!-- TELA 5: GESTÃO -->
+    <div id="tela-adm" class="aba">
+        <input id="e-adm" type="text" placeholder="E-mail Gestão">
+        <input id="s-adm" type="password" placeholder="Senha">
+        <button onclick="logar()" class="bg-purple">ENTRAR NO PAINEL</button>
+        <div id="p-adm" style="display:none; margin-top:20px; text-align:left;">
+            <div class="glass" style="background:#bc13fe; padding:30px;">
+                <p style="font-size:9px;">ESTOQUE</p>
+                <h2 style="font-size:24px; font-weight:900;">100.000.000 GEMS</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVEGAÇÃO -->
+    <footer style="max-width: 448px;">
+        <div id="b-home" onclick="mudar('home')" class="nav-tab nav-active">🏠<br>Início</div>
+        <div id="b-sorte" onclick="mudar('sorte')" class="nav-tab">🎡<br>Sorte</div>
+        <div id="b-live" onclick="mudar('live')" class="nav-tab">🎥<br>Live</div>
+        <div id="b-shop" onclick="mudar('shop')" class="nav-tab">💎<br>Gems</div>
+        <div id="b-adm" onclick="mudar('adm')" class="nav-tab">👤<br>Gestão</div>
+    </footer>
+
+    <script>
+        function mudar(id) {
+            const abas = ['home', 'sorte', 'live', 'shop', 'adm'];
+            abas.forEach(a => {
+                document.getElementById('tela-' + a).style.display = 'none';
+                document.getElementById('b-' + a).classList.remove('nav-active');
+            });
+            document.getElementById('tela-' + id).style.display = 'block';
+            document.getElementById('b-' + id).classList.add('nav-active');
+            window.scrollTo(0,0);
+        }
+        function logar() {
+            if(document.getElementById('e-adm').value === "radamez1228@gmail.com") {
+                document.getElementById('p-adm').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+  </html>
