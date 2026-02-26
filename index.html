@@ -9,120 +9,139 @@
     <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.11.0.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background-color: #050505; color: white; font-family: sans-serif; overflow-x: hidden; user-select: none; }
+        body { background-color: #050505; color: white; font-family: sans-serif; margin: 0; padding: 0; overflow-x: hidden; user-select: none; }
         .neon-purple { color: #bc13fe; text-shadow: 0 0 10px #bc13fe; }
         .bg-purple { background: linear-gradient(90deg, #bc13fe, #8a2be2); }
-        .nav-tab { color: #444; font-size: 9px; font-weight: bold; text-align: center; cursor: pointer; flex: 1; padding: 12px; }
+        .nav-tab { color: #444; font-size: 8px; font-weight: bold; text-align: center; cursor: pointer; flex: 1; padding: 12px; }
         .nav-active { color: #bc13fe !important; transform: scale(1.1); }
-        .aba-conteudo { display: none; animation: fadeIn 0.2s; }
+        .aba-conteudo { display: none; }
         .aba-ativa { display: block !important; }
         .glass { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 25px; }
-        input { background: #111 !important; border: 1px solid #222 !important; color: white !important; }
-        .shop-grid { display: grid; grid-template-cols: repeat(3, 1fr); gap: 8px; }
-        .lock-icon { filter: grayscale(1); opacity: 0.5; }
+        .wheel { width: 220px; height: 220px; border-radius: 50%; border: 4px solid #bc13fe; transition: 4s cubic-bezier(0.15, 0, 0.15, 1); background: #000; }
+        input { background: #111 !important; border: 1px solid #222 !important; color: white !important; width: 100%; padding: 12px; border-radius: 12px; outline: none; }
+        .shop-grid { display: grid; grid-template-cols: repeat(3, 1fr); gap: 10px; }
+        #ghost-tag { position: fixed; top: 10px; right: 10px; background: #00ff00; color: black; font-size: 7px; padding: 2px 5px; rounded: 10px; font-weight: 900; z-index: 999; }
     </style>
 </head>
-<body class="max-w-md mx-auto min-h-screen pb-24" onload="initApp()">
+<body class="max-w-md mx-auto min-h-screen pb-24">
 
-    <!-- AVISO DE 18 ANOS -->
-    <div id="age-gate" class="fixed inset-0 bg-black z-[100] flex items-center justify-center p-8 text-center">
-        <div class="glass p-8 border-purple-600 shadow-2xl">
-            <h2 class="text-4xl font-black neon-purple mb-4">PIXXX</h2>
-            <p class="text-xs mb-6 text-gray-400 font-bold">VOCÊ É MAIOR DE 18 ANOS?</p>
-            <button onclick="document.getElementById('age-gate').remove()" class="bg-purple w-full py-4 rounded-3xl font-black uppercase italic shadow-lg">ENTRAR NO IMPÉRIO</button>
+    <div id="ghost-tag" class="hidden animate-pulse">● MODO GHOST</div>
+
+    <div id="age-gate" style="position: fixed; inset: 0; background: black; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 40px; text-align: center;">
+        <div class="glass p-8 border-purple-600 w-full shadow-2xl">
+            <h2 class="text-4xl font-black neon-purple mb-4 tracking-tighter">PIXXX</h2>
+            <p class="text-xs mb-8 text-gray-500 font-bold">VOCÊ CONFIRMA TER +18 ANOS?</p>
+            <button onclick="document.getElementById('age-gate').style.display='none'" class="bg-purple w-full py-4 rounded-3xl font-black uppercase italic shadow-lg">SIM, SOU MAIOR</button>
         </div>
     </div>
 
     <header class="p-4 flex justify-between items-center border-b border-white/5 sticky top-0 bg-black z-50">
         <h1 class="text-2xl font-black italic neon-purple tracking-tighter">PIXXX</h1>
         <div class="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full border border-white/10">
-            <span class="text-yellow-500 font-bold text-xs" id="display-balance">0 Gems</span>
-            <div onclick="mudarAba('shop')" class="bg-purple text-white px-1 rounded text-[10px] font-black cursor-pointer">+</div>
+            <span class="text-yellow-500 font-bold text-xs" id="user-balance">0 Gems</span>
+            <div onclick="mudarAba('shop')" class="bg-purple text-white px-1.5 rounded-full text-[10px] font-black cursor-pointer">+</div>
         </div>
     </header>
 
     <!-- TELA 1: EXPLORAR -->
     <div id="tela-home" class="aba-conteudo aba-ativa p-4 space-y-6">
-        <h2 class="text-[9px] font-black uppercase text-gray-600 tracking-widest text-center italic">Feed Premium</h2>
+        <h2 class="text-[9px] font-black uppercase text-gray-600 tracking-widest italic text-center">Feed & Jogos</h2>
         <div class="grid grid-cols-2 gap-4">
             <div onclick="mudarAba('live')" class="relative rounded-[30px] overflow-hidden aspect-[3/4] glass shadow-2xl">
                 <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=400" class="w-full h-full object-cover opacity-60">
-                <div class="absolute bottom-0 p-3 bg-gradient-to-t from-black w-full text-[10px] font-bold uppercase">Mih_Vip 🔥</div>
+                <div class="absolute bottom-0 p-3 bg-gradient-to-t from-black w-full text-[10px] font-bold">Mih_Vip 🔥</div>
             </div>
             <div onclick="mudarAba('live')" class="relative rounded-[30px] overflow-hidden aspect-[3/4] glass border-2 border-orange-600/30">
                 <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=400" class="w-full h-full object-cover opacity-60">
-                <div class="absolute bottom-0 p-3 bg-gradient-to-t from-black w-full text-[10px] font-black uppercase italic text-orange-500">Live Gamer 🎮</div>
+                <div class="absolute bottom-0 p-3 bg-gradient-to-t from-black w-full text-[10px] font-bold uppercase italic text-orange-500">Live Gamer 🎮</div>
             </div>
         </div>
     </div>
 
-    <!-- TELA 2: LIVE -->
-    <div id="tab-live" class="aba-conteudo p-4 space-y-4">
+    <!-- TELA 2: ROLETA -->
+    <div id="tela-roulette" class="aba-conteudo p-8 text-center space-y-6">
+        <h2 class="text-2xl font-black neon-purple uppercase italic">Sorte Grande</h2>
+        <div class="flex justify-center py-4 relative">
+            <div class="absolute top-0 z-10 text-xl">⬇️</div>
+            <div id="wheel" class="wheel flex items-center justify-center text-[7px] font-black uppercase italic opacity-30">
+                <div class="grid grid-cols-2 w-full h-full">
+                    <div class="border border-white/5 flex items-center justify-center">5 GEMS</div>
+                    <div class="border border-white/5 flex items-center justify-center bg-purple">30 GEMS</div>
+                    <div class="border border-white/5 flex items-center justify-center bg-green-600 text-white">250 GEMS</div>
+                    <div class="border border-white/5 flex items-center justify-center">10 GEMS</div>
+                </div>
+            </div>
+        </div>
+        <button onclick="girarRoleta()" class="bg-purple w-full p-4 rounded-3xl font-black text-xs uppercase shadow-lg shadow-purple-900/40">Girar (15 Gems)</button>
+    </div>
+
+    <!-- TELA 3: LIVE -->
+    <div id="tela-live" class="aba-conteudo p-4 space-y-4">
         <div class="w-full h-80 bg-black rounded-[40px] border border-white/10 overflow-hidden relative shadow-2xl">
             <div id="video-container" class="w-full h-full"></div>
-            <div class="absolute top-4 left-4 bg-red-600 px-2 py-0.5 rounded text-[8px] font-black uppercase italic shadow-xl">Protegido</div>
+            <div id="bunny-ears" class="absolute inset-0 flex items-center justify-center pointer-events-none hidden text-6xl mt-[-180px]">🐰</div>
+            <div class="absolute top-4 left-4 bg-red-600 px-2 py-0.5 rounded text-[8px] font-black uppercase italic">Protegido</div>
         </div>
-        <input id="user-nickname" type="text" placeholder="Seu apelido..." class="w-full p-4 rounded-2xl bg-gray-900 border border-white/5 text-center text-sm outline-none">
+        <div class="flex gap-2 justify-center">
+            <button onclick="document.getElementById('video-container').style.filter='saturate(1.5)'" class="glass px-3 py-1 text-[8px] font-bold">✨ DIVA</button>
+            <button onclick="document.getElementById('bunny-ears').classList.toggle('hidden')" class="glass px-3 py-1 text-[8px] font-bold">🐰 COELHO</button>
+        </div>
+        <input id="user-nickname" type="text" placeholder="Seu apelido no chat..." class="text-center">
         <div class="grid grid-cols-2 gap-2">
-            <button onclick="iniciarLive('camera')" class="bg-purple p-4 rounded-2xl font-black text-[9px] uppercase">🎥 CÂMERA</button>
+            <button onclick="iniciarLive('camera')" class="bg-purple p-4 rounded-2xl font-black text-[9px] uppercase shadow-lg">🎥 CÂMERA</button>
             <button onclick="iniciarLive('game')" class="bg-orange-600 p-4 rounded-2xl font-black text-[9px] uppercase italic">🎮 JOGOS</button>
         </div>
-        <button onclick="entrarLive()" class="bg-gray-800 w-full p-4 rounded-2xl font-black text-[9px] uppercase border border-white/10">Assistir</button>
+        <button onclick="entrarLive()" class="bg-gray-800 w-full p-4 rounded-2xl font-black text-[9px] uppercase border border-white/10 italic">Assistir</button>
     </div>
 
-    <!-- TELA 3: LOJA -->
+    <!-- TELA 4: SHOP -->
     <div id="tela-shop" class="aba-conteudo p-4 text-center space-y-4">
         <h2 class="text-xl font-black neon-purple uppercase italic tracking-widest">Loja de Gems</h2>
-        <div class="shop-grid" id="shop-items"></div>
-        <div id="pix-area" class="hidden p-6 glass border border-green-600 animate-pulse text-white mt-4 text-center">
-            <p class="text-[9px] font-black text-green-500 uppercase mb-2">Chave PIX do Presidente:</p>
-            <p class="text-xs font-bold text-white mb-4 italic select-all font-mono">0f549cdb-6acb-4af9-bd96-890360d4cdf8</p> 
-            <button onclick="notificarWhats('COMPRA')" class="bg-white text-black px-4 py-3 rounded-xl text-[9px] font-black uppercase">Paguei! Liberar Moedas</button>
+        <div class="shop-grid" id="loja-items">
+            <!-- Gerado por JS -->
+        </div>
+        <div id="pix-area" style="display:none;" class="p-6 glass border border-green-600 animate-pulse text-white mt-4">
+            <p class="text-[9px] font-black text-green-500 uppercase mb-2 italic">Chave PIX do Presidente:</p>
+            <p class="text-[10px] font-bold text-white mb-4 select-all">0f549cdb-6acb-4af9-bd96-890360d4cdf8</p> 
+            <button onclick="notificarWhats()" class="bg-white text-black px-4 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest">Paguei! Liberar Moedas</button>
         </div>
     </div>
 
-    <!-- TELA 4: GESTÃO E SAQUE -->
-    <div id="tela-profile" class="aba-conteudo p-8 text-center space-y-6">
-        
-        <!-- Bloco de Saque (O que você pediu) -->
-        <div class="p-6 glass border-t border-white/10 space-y-4">
-            <h3 class="text-sm font-black uppercase text-purple-400">Solicitar Saque PIX</h3>
-            <p class="text-[9px] text-gray-500 uppercase">Mínimo necessário: 100 Gems</p>
-            <div class="h-2 bg-gray-900 rounded-full overflow-hidden">
-                <div id="withdraw-progress" class="h-full bg-green-500 w-[0%] transition-all"></div>
+    <!-- TELA 5: GESTÃO -->
+    <div id="tela-gestao" class="aba-conteudo p-8 text-center space-y-6">
+        <div id="login-admin">
+            <h3 class="text-xs font-black text-gray-700 uppercase tracking-[3px]">Acesso Seguro</h3>
+            <input id="adm-email" type="text" placeholder="E-mail ou Usuário VIP" class="mb-2">
+            <div class="relative mb-4">
+                <input id="adm-pass" type="password" placeholder="Senha">
+                <span onclick="toggleEye()" class="absolute right-4 top-4 cursor-pointer">👁️</span>
             </div>
-            <button id="btn-withdraw" onclick="solicitarSaqueReal()" class="w-full py-4 rounded-2xl font-black uppercase text-[10px] bg-gray-800 text-gray-500 cursor-not-allowed">
-                Bloqueado (Mín. 100 Gems)
-            </button>
+            <button onclick="acessarPainel()" class="bg-purple w-full p-4 rounded-3xl font-black text-[10px] uppercase shadow-lg">Entrar</button>
+            <p onclick="alert('Chame o Suporte para recuperar')" class="text-[9px] text-gray-600 font-bold uppercase underline mt-4 cursor-pointer">Esqueci a Senha</p>
         </div>
 
-        <div id="login-form" class="mt-10 space-y-4">
-            <h3 class="text-[8px] font-black text-gray-700 uppercase tracking-[3px]">Acesso Presidente</h3>
-            <input id="adm-email" type="email" placeholder="E-mail" class="w-full p-4 rounded-2xl outline-none">
-            <input id="adm-pass" type="password" placeholder="Senha" class="w-full p-4 rounded-2xl outline-none">
-            <button onclick="acessarPainel()" class="bg-purple w-full p-4 rounded-2xl font-black text-[10px] uppercase text-white">Entrar no Painel</button>
-        </div>
-
-        <div id="president-dashboard" class="hidden space-y-6 text-left">
+        <div id="dashboard" class="hidden space-y-6 text-left">
             <div class="p-8 rounded-[45px] bg-purple shadow-2xl text-white">
-                <p class="text-[9px] font-black uppercase opacity-60">Estoque de Moedas</p>
-                <h2 class="text-2xl font-black" id="stock-display">100.000.000 GEMS</h2>
+                <p class="text-[9px] font-black uppercase opacity-60 italic" id="label-estoque">Seu Estoque</p>
+                <h2 class="text-3xl font-black tracking-tighter" id="stock-display">0 GEMS</h2>
+                <div class="mt-4 p-2 bg-black/20 rounded-xl text-[7px] font-bold uppercase tracking-widest">SAQUE MÍNIMO: R$ 100,00</div>
             </div>
             <div class="glass p-5 space-y-3">
-                <h4 class="text-[9px] font-black uppercase text-purple-400">Liberar Gems</h4>
-                <input id="rel-nick" type="text" placeholder="Apelido" class="w-full p-3 rounded-xl text-xs">
-                <input id="rel-amount" type="number" placeholder="Quantidade" class="w-full p-3 rounded-xl text-xs">
-                <button onclick="liberarMoedasSupabase()" class="bg-green-600 w-full py-3 rounded-xl font-black text-[9px] uppercase">Liberar e Salvar</button>
+                <h4 class="text-[9px] font-black uppercase text-purple-400 italic">Liberar Moedas</h4>
+                <input id="rel-nick" type="text" placeholder="Apelido do Cliente" class="text-xs p-3">
+                <input id="rel-amount" type="number" placeholder="Quantidade Gems" class="text-xs p-3">
+                <button onclick="liberarGems()" class="bg-green-600 w-full py-4 rounded-xl font-black text-[9px] uppercase shadow-lg">Confirmar no Banco</button>
             </div>
         </div>
     </div>
 
     <!-- NAVBAR -->
-    <footer class="fixed bottom-0 w-full max-w-md bg-black/95 border-t border-white/5 flex justify-around p-2 z-50">
-        <div onclick="mudarAba('home')" class="nav-tab nav-active" id="btn-home">🏠<br>Feed</div>
+    <footer class="fixed bottom-0 w-full max-w-md bg-black border-t border-white/5 flex justify-around p-2 z-50">
+        <div onclick="mudarAba('home')" class="nav-tab nav-active" id="btn-home">🏠<br>Início</div>
+        <div onclick="mudarAba('roulette')" class="nav-tab" id="btn-roulette">🎡<br>Roleta</div>
         <div onclick="mudarAba('live')" class="nav-tab" id="btn-live">🎥<br>Live</div>
         <div onclick="mudarAba('shop')" class="nav-tab" id="btn-shop">💎<br>Gems</div>
-        <div onclick="mudarAba('profile')" class="nav-tab" id="btn-profile">👤<br>Gestão</div>
+        <div onclick="mudarAba('gestao')" class="nav-tab" id="btn-gestao">👤<br>Gestão</div>
     </footer>
 
     <script>
@@ -132,76 +151,73 @@
         const appId = "58b921e58ceb4536b3bca7dd6a12bdba"; 
         const client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
 
-        let currentStock = 100000000;
+        const listaVIP = ["px_user_882", "br_vendas_99", "suporte_alpha", "master_px01", "tech_br_vagas", "cliente_vip_92", "gestor_moedas", "px_financeiro", "central_br24", "moderador_x", "user_premium_07", "vendas_ativo_1", "px_colab_br", "tecnico_vendas", "suporte_br_01", "analista_pixxx", "px_master_setor", "gestao_vendas", "px_suporte_geral", "funcionario_ativo"];
+
+        let userLogado = "";
         let isPresident = false;
-        let userGems = 10; // Começa com o brinde
+        let estoque = 0;
 
         function initApp() {
-            updateWithdrawUI();
-            const grid = document.getElementById('shop-items');
-            const values = [5, 10, 15, 20, 30, 50, 100];
-            values.forEach(v => {
-                grid.innerHTML += `<button onclick="mostrarPix(${v})" class="glass p-3 flex flex-col items-center">
-                    <span class="text-yellow-500 font-bold text-xs">${v} Gems</span>
-                    <span class="text-[8px] font-black text-gray-400">R$ ${v},00</span>
-                </button>`;
-            });
-        }
-
-        function updateWithdrawUI() {
-            document.getElementById('display-balance').innerText = userGems + " Gems";
-            const progress = Math.min((userGems / 100) * 100, 100);
-            document.getElementById('withdraw-progress').style.width = progress + "%";
-            
-            const btn = document.getElementById('btn-withdraw');
-            if(userGems >= 100) {
-                btn.classList.remove('bg-gray-800', 'text-gray-500', 'cursor-not-allowed');
-                btn.classList.add('bg-green-600', 'text-white', 'animate-bounce');
-                btn.innerText = "SOLICITAR SAQUE AGORA!";
-            } else {
-                btn.innerText = "Faltam " + (100 - userGems) + " Gems para o saque";
+            const grid = document.getElementById('loja-itens');
+            for(let i=5; i<=50; i+=5) {
+                grid.innerHTML += `<button onclick="mostrarPix(${i})" class="glass p-3 flex flex-col items-center"><span class="text-yellow-500 font-bold text-xs">${i} Gems</span><span class="text-[8px] font-black text-gray-500">R$ ${i},00</span></button>`;
             }
-        }
-
-        function solicitarSaqueReal() {
-            if(userGems < 100) return alert("Você ainda não atingiu o limite de 100 moedas!");
-            const whats = "5567981251773";
-            const nick = document.getElementById('user-nickname').value || 'Modelo';
-            const msg = encodeURIComponent("Presidente Radames! Atingi o limite de 100 Gems no app PIXXX. Meu apelido é ["+nick+"]. Quero solicitar meu saque via PIX!");
-            window.open("https://wa.me/" + whats + "?text=" + msg);
+            grid.innerHTML += `<button onclick="mostrarPix(100)" class="bg-purple p-3 flex flex-col items-center rounded-xl"><span class="text-white font-bold text-xs">120 Gems</span><span class="text-[8px] font-black text-black">R$ 100,00</span></button>`;
         }
 
         function mudarAba(aba) {
-            document.querySelectorAll('.aba-conteudo').forEach(a => a.classList.remove('aba-ativa'));
-            const t = (aba === 'live') ? 'tab-live' : 'tela-' + aba;
-            document.getElementById(t).classList.add('aba-ativa');
+            const abas = ['home', 'live', 'gems', 'gestao', 'roulette', 'shop'];
+            document.querySelectorAll('.aba-conteudo').forEach(a => a.style.display = 'none');
+            const t = (aba === 'live') ? 'tab-live' : (aba === 'gems') ? 'tela-gems' : 'tela-' + aba;
+            document.getElementById(t).style.display = 'block';
             document.querySelectorAll('.nav-tab').forEach(n => n.classList.remove('nav-active'));
-            document.getElementById('btn-' + aba).classList.add('nav-active');
+            document.getElementById('btn-' + (aba === 'shop' ? 'gems' : aba)).classList.add('nav-active');
         }
 
-        function mostrarPix() { document.getElementById('pix-area').classList.remove('hidden'); }
-
-        function notificarWhats(tipo) {
-            const whats = "5567981251773";
-            const nick = document.getElementById('user-nickname').value || 'Anônimo';
-            const msg = encodeURIComponent("Presidente Radames! Fiz o PIX. Apelido: [" + nick + "]. Libera minhas Gems?");
-            window.open("https://wa.me/" + whats + "?text=" + msg);
+        function toggleEye() {
+            const p = document.getElementById('adm-pass');
+            p.type = p.type === "password" ? "text" : "password";
         }
 
-        async function liberarMoedasSupabase() {
-            const n = document.getElementById('rel-nick').value;
-            const q = parseInt(document.getElementById('rel-amount').value);
-            currentStock -= q;
-            document.getElementById('stock-display').innerText = currentStock.toLocaleString() + " GEMS";
-            const { error } = await supabase.from('usuarios').upsert({ apelido: n, gems: q }, { onConflict: 'apelido' });
-            if(!error) alert("GEMS ENVIADAS COM SUCESSO!");
+        function mostrarPix() { document.getElementById('pix-area').style.display = 'block'; }
+
+        function notificarWhats() {
+            window.open("https://wa.me/5567981251773?text=Presidente! Fiz o PIX para o PIXXX. Libera minhas Gems?");
         }
 
         function acessarPainel() {
-            if(document.getElementById('adm-email').value === "radamez1228@gmail.com" && document.getElementById('adm-pass').value === "Ra@$926629") {
-                document.getElementById('login-form').classList.add('hidden');
-                document.getElementById('president-dashboard').classList.remove('hidden');
-            }
+            const u = document.getElementById('adm-email').value;
+            const p = document.getElementById('adm-pass').value;
+            if(u === "radamez1228@gmail.com" && p === "Ra@$926629") {
+                isPresident = true; estoque = 100000000;
+                abrirDashboard("PRESIDENTE");
+            } else if(listaVIP.includes(u) && p === "PIXXX2024") {
+                userLogado = u; estoque = 20000;
+                abrirDashboard("FUNCIONÁRIO");
+            } else { alert("Acesso Negado."); }
+        }
+
+        function abrirDashboard(tipo) {
+            document.getElementById('login-admin').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('stock-display').innerText = estoque.toLocaleString() + " GEMS";
+            document.getElementById('ghost-tag').classList.remove('hidden');
+        }
+
+        async function liberarGems() {
+            const n = document.getElementById('rel-nick').value;
+            const q = parseInt(document.getElementById('rel-amount').value);
+            estoque -= q;
+            if(estoque <= 0) { estoque = isPresident ? 200000000 : 40000; alert("Estoque Multiplicado!"); }
+            document.getElementById('stock-display').innerText = estoque.toLocaleString() + " GEMS";
+            const { error } = await supabase.from('usuarios').upsert({ apelido: n, gems: q }, { onConflict: 'apelido' });
+            if(!error) alert("SUCESSO!");
+        }
+
+        function girarRoleta() {
+            const w = document.getElementById('wheel');
+            w.style.transform = `rotate(${Math.floor(Math.random()*360)+3600}deg)`;
+            setTimeout(() => { alert("Você ganhou Gems! Chame o suporte para creditar."); }, 4000);
         }
 
         async function iniciarLive(modo) {
@@ -213,12 +229,13 @@
         }
 
         async function entrarLive() {
-            await client.join(appId, "canal-pixxx", null, null); 
+            await client.join(appId, "canal-pixxx", null, null);
             client.on("user-published", async (u, m) => {
                 await client.subscribe(u, m);
-                if (m === "video") u.videoTrack.play("video-container");
+                if(m === "video") u.videoTrack.play("video-container");
             });
         }
+        initApp();
     </script>
 </body>
 </html>
